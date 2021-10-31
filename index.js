@@ -1,5 +1,6 @@
 const express = require("express");
 const { MongoClient } = require('mongodb');
+const ObjectId = require("mongodb").ObjectId;
 require('dotenv').config();
 const cors = require("cors");
 require("dotenv").config();
@@ -23,8 +24,6 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.send("Welcome to my server");
 });
-
-
 
 async function run() {
     try {
@@ -57,7 +56,37 @@ async function run() {
             orderCollection.insertOne(req.body).then((result) => {
                 res.send(result);
             })
-        })
+        });
+
+
+        // My Order
+
+        app.get("/myOrder/:email", async (req, res) => {
+            const result = await orderCollection.find({
+                email: req.params.email,
+            }).toArray();
+            res.send(result);
+        });
+
+        // Get All Order
+
+        app.get("/allOrder", async (req, res) => {
+            const result = await orderCollection.find({}).toArray();
+            res.send(result);
+            console.log(result);
+        });
+
+
+        // Delete Order
+
+        app.delete("/deleteOrder/:id", async (req, res) => {
+            console.log(req.params.id);
+            const result = await orderCollection.deleteOne({
+                _id: ObjectId(req.params.id),
+            });
+            res.send(result);
+        });
+
     }
     finally {
         // await client.close();
